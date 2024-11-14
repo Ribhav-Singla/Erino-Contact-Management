@@ -1,0 +1,202 @@
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import Pagination from "@mui/material/Pagination";
+import { useState } from "react";
+import DeleteContact from "../components/DeleteContact";
+
+// LIMIT is also defined in the backend as 15
+const LIMIT = 15;
+const data = [
+  {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    phoneNumber: 1234567890,
+    company: "Example Corp",
+    jobTitle: "Software Engineer",
+  },
+  {
+    firstName: "Jane",
+    lastName: "Smith",
+    email: "jane.smith@example.com",
+    phoneNumber: 9876543210,
+    company: "Tech Innovations",
+    jobTitle: "Product Manager",
+  },
+  {
+    firstName: "Michael",
+    lastName: "Johnson",
+    email: "michael.johnson@example.com",
+    phoneNumber: 2345678901,
+    company: "Global Solutions",
+    jobTitle: "Marketing Director",
+  },
+  {
+    firstName: "Emily",
+    lastName: "Williams",
+    email: "emily.williams@example.com",
+    phoneNumber: 3456789012,
+    company: "Creative Agency",
+    jobTitle: "Graphic Designer",
+  },
+  {
+    firstName: "David",
+    lastName: "Brown",
+    email: "david.brown@example.com",
+    phoneNumber: 4567890123,
+    company: "Innovative Systems",
+    jobTitle: "Project Manager",
+  },
+];
+
+interface CONTACT {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: number;
+  company: string;
+  jobTitle: string;
+}
+
+export default function Contacts() {
+  const [sortBy, setSortBy] = useState<number>(1);
+  const [rows, setRows] = useState(data);
+  const [totalContacts, setTotalContacts] = useState<number>(200);
+  const [page, setPage] = useState<number>(1);
+  const [toggleDelete, setToggleDelete] = useState<Boolean>(false);
+  const [selectedContact, setSelectedContact] = useState<CONTACT | null>(null);
+
+  const sortAscending = () => {
+    return rows.sort((a, b) => {
+      if (a.firstName.toLowerCase() < b.firstName.toLowerCase()) return -1;
+      if (a.firstName.toLowerCase() > b.firstName.toLowerCase()) return 1;
+      if (a.lastName.toLowerCase() < b.lastName.toLowerCase()) return -1;
+      if (a.lastName.toLowerCase() > b.lastName.toLowerCase()) return 1;
+      return 0;
+    });
+  };
+
+  const sortDescending = () => {
+    return rows.sort((a, b) => {
+      if (a.firstName.toLowerCase() > b.firstName.toLowerCase()) return -1;
+      if (a.firstName.toLowerCase() < b.firstName.toLowerCase()) return 1;
+      if (a.lastName.toLowerCase() > b.lastName.toLowerCase()) return -1;
+      if (a.lastName.toLowerCase() < b.lastName.toLowerCase()) return 1;
+      return 0;
+    });
+  };
+
+  const handleSortBy = (num: number) => {
+    if (sortBy == num) return;
+    else if (sortBy == 1) {
+      setSortBy(-1);
+      setRows(sortDescending());
+    } else {
+      setSortBy(1);
+      setRows(sortAscending());
+    }
+  };
+
+  return (
+    <div className="my-10 bg-slate-50">
+      <div className="flex flex-col justify-center items-center gap-5 py-5 px-5 ">
+        <h1 className="text-xl font-semibold">SortBy</h1>
+        <Stack spacing={2} direction="row">
+          <Button
+            variant={sortBy == 1 ? `contained` : "outlined"}
+            onClick={() => handleSortBy(1)}
+          >
+            Ascending
+          </Button>
+          <Button
+            variant={sortBy == 1 ? `outlined` : "contained"}
+            onClick={() => handleSortBy(-1)}
+          >
+            Descending
+          </Button>
+        </Stack>
+      </div>
+
+      <div className="px-10">
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>s.no</TableCell>
+                <TableCell align="right">firstName</TableCell>
+                <TableCell align="right">lastName</TableCell>
+                <TableCell align="right">email</TableCell>
+                <TableCell align="right">phoneNumber</TableCell>
+                <TableCell align="right">company</TableCell>
+                <TableCell align="right">jobTitle</TableCell>
+                <TableCell align="right" colSpan={2}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row: CONTACT, index) => (
+                <TableRow
+                  key={row.phoneNumber}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell align="right">{row.firstName}</TableCell>
+                  <TableCell align="right">{row.lastName}</TableCell>
+                  <TableCell align="right">{row.email}</TableCell>
+                  <TableCell align="right">{row.phoneNumber}</TableCell>
+                  <TableCell align="right">{row.company}</TableCell>
+                  <TableCell align="right">{row.jobTitle}</TableCell>
+                  <TableCell align="right">
+                    <EditNoteIcon className="text-green-600 cursor-pointer" />
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    onClick={() => {
+                      setSelectedContact(row);
+                      setToggleDelete(!toggleDelete);
+                    }}
+                  >
+                    <DeleteIcon className="text-red-600 cursor-pointer" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+
+      <div className="flex justify-center items-center py-5">
+        <Pagination
+          count={Math.ceil(totalContacts / LIMIT)}
+          variant="outlined"
+          shape="rounded"
+          color="primary"
+        />
+      </div>
+
+      {toggleDelete && selectedContact && (
+        <DeleteContact
+          firstName={selectedContact.firstName}
+          lastName={selectedContact.lastName}
+          email={selectedContact.email}
+          phoneNumber={selectedContact.phoneNumber}
+          company={selectedContact.company}
+          jobTitle={selectedContact.jobTitle}
+          setToggleDelete={setToggleDelete}
+        />
+      )}
+    </div>
+  );
+}
