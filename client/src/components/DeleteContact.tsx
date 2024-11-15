@@ -1,8 +1,11 @@
+import { Snackbar, Alert } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import { ReactNode, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 function DeleteContact({
+  id,
   firstName,
   lastName,
   email,
@@ -10,7 +13,9 @@ function DeleteContact({
   company,
   jobTitle,
   setToggleDelete,
+  setRefreshContacts,
 }: {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -18,8 +23,45 @@ function DeleteContact({
   company: string;
   jobTitle: string;
   setToggleDelete: React.Dispatch<React.SetStateAction<Boolean>>;
+  setRefreshContacts: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<{
+    message: string;
+    severity: "error" | "info";
+  }>({
+    message: "",
+    severity: "info",
+  });
+
+  const handleDeleteContact = async () => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/contacts/${id}`
+      );
+      if (response.status == 200) {
+        const successMessage = "Contact deleted successfully";
+        setSnackbarMessage({
+          message: successMessage,
+          severity: "info",
+        });
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          setToggleDelete(false);
+          setRefreshContacts(prev => !prev);
+        }, 500);
+      }
+    } catch (error) {
+      //@ts-ignore
+      const errorMessage = error.response?.data?.message || "An error occurred while deleting the contact.";
+      setSnackbarMessage({
+        message: errorMessage,
+        severity: "error",
+      });
+      setSnackbarOpen(true);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -28,7 +70,7 @@ function DeleteContact({
         !containerRef.current.contains(e.target as Node)
       ) {
         setToggleDelete(false);
-      } 
+      }
     };
 
     document.addEventListener("click", handleClickOutside);
@@ -58,7 +100,11 @@ function DeleteContact({
             Are you sure you want to delete?
           </h1>
           <Stack spacing={2} direction="row">
-            <Button variant="contained" color="error">
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDeleteContact}
+            >
               Yes
             </Button>
             <Button variant="contained" onClick={() => setToggleDelete(false)}>
@@ -66,6 +112,20 @@ function DeleteContact({
             </Button>
           </Stack>
         </div>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarMessage.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage.message}
+          </Alert>
+        </Snackbar>
       </div>
     </>
   );

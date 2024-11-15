@@ -5,16 +5,10 @@ const getContacts = async (req, res) => {
   const limit = 15;
   const page = req.query.page || 1;
   const skip = (Number(page) - 1) * limit;
-  const sortField = "firstName";
-  const sortDirection = req.query.sortBy === "desc" ? -1 : 1;
-
   try {
-    const contacts = await Contacts.find()
-      .skip(skip)
-      .limit(limit)
-      .sort({ [sortField]: sortDirection });
-
-    res.status(200).json(contacts);
+    const totalContacts = await Contacts.countDocuments();
+    const contacts = await Contacts.find().skip(skip).limit(limit);
+    res.status(200).json({ totalContacts, contacts });
   } catch (error) {
     res.status(500).json({ message: "Error fetching contacts" });
   }
@@ -67,17 +61,33 @@ const updateContact = async (req, res) => {
     req.body;
 
   try {
-    const existingContact = await Contacts.findOne({
-      $or: [{ email }, { phoneNumber }],
-    });
-
-    if (existingContact) {
-      return res.status(400).json({
-        message: "Contact with this email or phone number already exists",
-      });
+    const existingContact = await Contacts.findById(id);
+    if (!existingContact) {
+      return res.status(404).json({ message: "Contact not found" });
     }
 
-    const contact = await Contacts.findByIdAndUpdate(
+    const query = {};
+    if (email && email !== existingContact.email) {
+      query.email = email;
+    }
+    if (phoneNumber && phoneNumber !== existingContact.phoneNumber) {
+      query.phoneNumber = phoneNumber;
+    }
+
+    //  if the email or the phoneNumber is changed then we will check if other user has the same email or phoneNumber
+    if (query.email || query.phoneNumber) {
+      const duplicateContact = await Contacts.findOne({
+        $or: [{ email: query.email }, { phoneNumber: query.phoneNumber }],
+      });
+
+      if (duplicateContact) {
+        return res.status(400).json({
+          message: "Contact with this email or phone number already exists",
+        });
+      }
+    }
+
+    const updatedContact = await Contacts.findByIdAndUpdate(
       id,
       {
         firstName,
@@ -89,12 +99,10 @@ const updateContact = async (req, res) => {
       },
       { new: true }
     );
-    if (!contact) {
-      return res.status(404).json({ message: "Contact not found" });
-    }
-    res.status(200).json(contact);
+
+    res.status(200).json(updatedContact);
   } catch (error) {
-    console.log("error while updating: ", error);
+    console.log("Error while updating: ", error);
     res.status(500).json({ message: "Error updating contact" });
   }
 };

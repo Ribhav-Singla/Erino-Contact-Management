@@ -3,6 +3,8 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import FormControl from "@mui/material/FormControl";
@@ -15,6 +17,7 @@ import AddIcCallIcon from "@mui/icons-material/AddIcCall";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface FormDataType {
   firstName: string;
@@ -52,6 +55,14 @@ export default function CreateContact() {
     phoneNumber: "",
     company: "",
     jobTitle: "",
+  });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<{
+    message: string;
+    severity: "error" | "success";
+  }>({
+    message: "",
+    severity: "success",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,17 +125,48 @@ export default function CreateContact() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateFields()) {
-      console.log("Form data:", formData);
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/contacts/`,
+          {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber,
+            company: formData.company,
+            jobTitle: formData.jobTitle,
+          }
+        );
+        if (response.status == 201) {
+          const successMessage = "Contact created successfully";
+          setSnackbarMessage({
+            message: successMessage,
+            severity: "success",
+          });
+          setSnackbarOpen(true);
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
+        }
+      } catch (error) {
+        //@ts-ignore
+        const errorMessage = error.response?.data?.message || "An error occurred while creating the contact.";
+        setSnackbarMessage({
+          message: errorMessage,
+          severity: "error",
+        });
+        setSnackbarOpen(true);
+      }
     }
   };
 
   return (
     <div className="flex flex-col justify-center items-center py-10 gap-5 bg-slate-50 h-full">
       <div className="flex justify-start items-center max-w-[768px] w-full">
-        <Button variant="contained" onClick={()=>navigate('/')}>
+        <Button variant="contained" onClick={() => navigate("/")}>
           <ArrowBackIcon />
         </Button>
       </div>
@@ -251,6 +293,20 @@ export default function CreateContact() {
           </Button>
         </div>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarMessage.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

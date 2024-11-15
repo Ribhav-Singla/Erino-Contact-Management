@@ -12,135 +12,16 @@ import Button from "@mui/material/Button";
 import Pagination from "@mui/material/Pagination";
 import DeleteContact from "../components/DeleteContact";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // LIMIT is also defined in the backend as 15
 const LIMIT = 15;
-const data = [
-  {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phoneNumber: "1234567890",
-    company: "Example Corp",
-    jobTitle: "Software Engineer",
-  },
-  {
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane.smith@example.com",
-    phoneNumber: "1234567890",
-    company: "Tech Innovations",
-    jobTitle: "Product Manager",
-  },
-  {
-    firstName: "Michael",
-    lastName: "Johnson",
-    email: "michael.johnson@example.com",
-    phoneNumber: "1234567890",
-    company: "Global Solutions",
-    jobTitle: "Marketing Director",
-  },
-  {
-    firstName: "Emily",
-    lastName: "Williams",
-    email: "emily.williams@example.com",
-    phoneNumber: "1234567890",
-    company: "Creative Agency",
-    jobTitle: "Graphic Designer",
-  },
-  {
-    firstName: "David",
-    lastName: "Brown",
-    email: "david.brown@example.com",
-    phoneNumber: "1234567890",
-    company: "Innovative Systems",
-    jobTitle: "Project Manager",
-  },
-  {
-    firstName: "Sarah",
-    lastName: "Taylor",
-    email: "sarah.taylor@example.com",
-    phoneNumber: "0987654321",
-    company: "FinTech Solutions",
-    jobTitle: "Data Scientist",
-  },
-  {
-    firstName: "Chris",
-    lastName: "Miller",
-    email: "chris.miller@example.com",
-    phoneNumber: "0987654321",
-    company: "Digital Works",
-    jobTitle: "Backend Developer",
-  },
-  {
-    firstName: "Patricia",
-    lastName: "Davis",
-    email: "patricia.davis@example.com",
-    phoneNumber: "0987654321",
-    company: "Smart Apps",
-    jobTitle: "UI/UX Designer",
-  },
-  {
-    firstName: "James",
-    lastName: "Garcia",
-    email: "james.garcia@example.com",
-    phoneNumber: "0987654321",
-    company: "Enterprise Inc",
-    jobTitle: "DevOps Engineer",
-  },
-  {
-    firstName: "Sophia",
-    lastName: "Martinez",
-    email: "sophia.martinez@example.com",
-    phoneNumber: "0987654321",
-    company: "Health Tech",
-    jobTitle: "Product Designer",
-  },
-  {
-    firstName: "Brian",
-    lastName: "Lopez",
-    email: "brian.lopez@example.com",
-    phoneNumber: "0987654321",
-    company: "Eco World",
-    jobTitle: "Environmental Consultant",
-  },
-  {
-    firstName: "Olivia",
-    lastName: "Wilson",
-    email: "olivia.wilson@example.com",
-    phoneNumber: "0987654321",
-    company: "Edu Solutions",
-    jobTitle: "Instructional Designer",
-  },
-  {
-    firstName: "Jack",
-    lastName: "Clark",
-    email: "jack.clark@example.com",
-    phoneNumber: "0987654321",
-    company: "Mobile Labs",
-    jobTitle: "Android Developer",
-  },
-  {
-    firstName: "Liam",
-    lastName: "Robinson",
-    email: "liam.robinson@example.com",
-    phoneNumber: "0987654321",
-    company: "Retail Ventures",
-    jobTitle: "E-commerce Specialist",
-  },
-  {
-    firstName: "Emma",
-    lastName: "Harris",
-    email: "emma.harris@example.com",
-    phoneNumber: "0987654321",
-    company: "Global Ventures",
-    jobTitle: "Business Analyst",
-  },
-];
 
 interface CONTACT {
+  _id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -152,11 +33,13 @@ interface CONTACT {
 export default function Contacts() {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<number>(1);
-  const [rows, setRows] = useState(data);
+  const [rows, setRows] = useState<CONTACT[]>([]);
   const [totalContacts, setTotalContacts] = useState<number>(200);
   const [page, setPage] = useState<number>(1);
   const [toggleDelete, setToggleDelete] = useState<Boolean>(false);
+  const [refreshContacts, setRefreshContacts] = useState(false);
   const [selectedContact, setSelectedContact] = useState<CONTACT | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const sortAscending = () => {
     return rows.sort((a, b) => {
@@ -188,6 +71,58 @@ export default function Contacts() {
       setRows(sortAscending());
     }
   };
+
+  useEffect(() => {
+    const getContacts = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/contacts?page=${page}`
+        );
+        if (response.status == 200) {
+          const sortedContacts = response.data.contacts.sort(
+            (a: CONTACT, b: CONTACT) => {
+              if (sortBy === 1) {
+                if (a.firstName.toLowerCase() < b.firstName.toLowerCase())
+                  return -1;
+                if (a.firstName.toLowerCase() > b.firstName.toLowerCase())
+                  return 1;
+                if (a.lastName.toLowerCase() < b.lastName.toLowerCase())
+                  return -1;
+                if (a.lastName.toLowerCase() > b.lastName.toLowerCase())
+                  return 1;
+                return 0;
+              } else {
+                if (a.firstName.toLowerCase() > b.firstName.toLowerCase())
+                  return -1;
+                if (a.firstName.toLowerCase() < b.firstName.toLowerCase())
+                  return 1;
+                if (a.lastName.toLowerCase() > b.lastName.toLowerCase())
+                  return -1;
+                if (a.lastName.toLowerCase() < b.lastName.toLowerCase())
+                  return 1;
+                return 0;
+              }
+            }
+          );
+          setTotalContacts(response.data.totalContacts);
+          setRows(sortedContacts);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.log("error ocuured while getting contacts: ", error);
+      }
+    };
+
+    getContacts();
+  }, [refreshContacts, page]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 py-5">
@@ -234,11 +169,11 @@ export default function Contacts() {
             <TableBody>
               {rows.map((row: CONTACT, index) => (
                 <TableRow
-                  key={index}
+                  key={row._id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {index + 1}
+                    {LIMIT * (page - 1) + index + 1}
                   </TableCell>
                   <TableCell align="right">{row.firstName}</TableCell>
                   <TableCell align="right">{row.lastName}</TableCell>
@@ -249,7 +184,9 @@ export default function Contacts() {
                   <TableCell
                     align="right"
                     onClick={() =>
-                      navigate(`/updateContact/${index}`, { state: { contact: row } })
+                      navigate(`/updateContact/${row._id}`, {
+                        state: { contact: row },
+                      })
                     }
                   >
                     <EditNoteIcon className="text-green-600 cursor-pointer" />
@@ -277,11 +214,14 @@ export default function Contacts() {
           variant="outlined"
           shape="rounded"
           color="primary"
+          page={page}
+          onChange={(event, value) => setPage(value)}
         />
       </div>
 
       {toggleDelete && selectedContact && (
         <DeleteContact
+          id={selectedContact._id}
           firstName={selectedContact.firstName}
           lastName={selectedContact.lastName}
           email={selectedContact.email}
@@ -289,6 +229,7 @@ export default function Contacts() {
           company={selectedContact.company}
           jobTitle={selectedContact.jobTitle}
           setToggleDelete={setToggleDelete}
+          setRefreshContacts={setRefreshContacts}
         />
       )}
     </div>
