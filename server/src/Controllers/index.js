@@ -5,9 +5,14 @@ const getContacts = async (req, res) => {
   const limit = 15;
   const page = req.query.page || 1;
   const skip = (Number(page) - 1) * limit;
+  const sortDirection = req.query.sortBy == "desc" ? -1 : 1;
+  
   try {
     const totalContacts = await Contacts.countDocuments();
-    const contacts = await Contacts.find().skip(skip).limit(limit);
+    const contacts = await Contacts.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ firstName: sortDirection, lastName: sortDirection});
     res.status(200).json({ totalContacts, contacts });
   } catch (error) {
     res.status(500).json({ message: "Error fetching contacts" });

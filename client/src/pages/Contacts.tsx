@@ -32,7 +32,7 @@ interface CONTACT {
 
 export default function Contacts() {
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState<number>(1);
+  const [sortBy, setSortBy] = useState<string>('asc');
   const [rows, setRows] = useState<CONTACT[]>([]);
   const [totalContacts, setTotalContacts] = useState<number>(200);
   const [page, setPage] = useState<number>(1);
@@ -40,35 +40,13 @@ export default function Contacts() {
   const [refreshContacts, setRefreshContacts] = useState(false);
   const [selectedContact, setSelectedContact] = useState<CONTACT | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const sortAscending = () => {
-    return rows.sort((a, b) => {
-      if (a.firstName.toLowerCase() < b.firstName.toLowerCase()) return -1;
-      if (a.firstName.toLowerCase() > b.firstName.toLowerCase()) return 1;
-      if (a.lastName.toLowerCase() < b.lastName.toLowerCase()) return -1;
-      if (a.lastName.toLowerCase() > b.lastName.toLowerCase()) return 1;
-      return 0;
-    });
-  };
-
-  const sortDescending = () => {
-    return rows.sort((a, b) => {
-      if (a.firstName.toLowerCase() > b.firstName.toLowerCase()) return -1;
-      if (a.firstName.toLowerCase() < b.firstName.toLowerCase()) return 1;
-      if (a.lastName.toLowerCase() > b.lastName.toLowerCase()) return -1;
-      if (a.lastName.toLowerCase() < b.lastName.toLowerCase()) return 1;
-      return 0;
-    });
-  };
-
-  const handleSortBy = (num: number) => {
-    if (sortBy == num) return;
-    else if (sortBy == 1) {
-      setSortBy(-1);
-      setRows(sortDescending());
+  
+  const handleSortBy = (orderBy: string) => {
+    if (sortBy == orderBy) return;
+    else if (sortBy == 'asc') {
+      setSortBy('desc');
     } else {
-      setSortBy(1);
-      setRows(sortAscending());
+      setSortBy('asc');
     }
   };
 
@@ -76,36 +54,11 @@ export default function Contacts() {
     const getContacts = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/contacts?page=${page}`
-        );
+          `${import.meta.env.VITE_BACKEND_URL}/contacts?page=${page}&sortBy=${sortBy}`
+        );        
         if (response.status == 200) {
-          const sortedContacts = response.data.contacts.sort(
-            (a: CONTACT, b: CONTACT) => {
-              if (sortBy === 1) {
-                if (a.firstName.toLowerCase() < b.firstName.toLowerCase())
-                  return -1;
-                if (a.firstName.toLowerCase() > b.firstName.toLowerCase())
-                  return 1;
-                if (a.lastName.toLowerCase() < b.lastName.toLowerCase())
-                  return -1;
-                if (a.lastName.toLowerCase() > b.lastName.toLowerCase())
-                  return 1;
-                return 0;
-              } else {
-                if (a.firstName.toLowerCase() > b.firstName.toLowerCase())
-                  return -1;
-                if (a.firstName.toLowerCase() < b.firstName.toLowerCase())
-                  return 1;
-                if (a.lastName.toLowerCase() > b.lastName.toLowerCase())
-                  return -1;
-                if (a.lastName.toLowerCase() < b.lastName.toLowerCase())
-                  return 1;
-                return 0;
-              }
-            }
-          );
           setTotalContacts(response.data.totalContacts);
-          setRows(sortedContacts);
+          setRows(response.data.contacts);
           setLoading(false);
         }
       } catch (error) {
@@ -114,7 +67,7 @@ export default function Contacts() {
     };
 
     getContacts();
-  }, [refreshContacts, page]);
+  }, [refreshContacts, page, sortBy]);
 
   if (loading) {
     return (
@@ -135,14 +88,14 @@ export default function Contacts() {
         <h1 className="text-xl font-semibold">SortBy</h1>
         <Stack spacing={2} direction="row">
           <Button
-            variant={sortBy == 1 ? `contained` : "outlined"}
-            onClick={() => handleSortBy(1)}
+            variant={sortBy == 'asc' ? `contained` : "outlined"}
+            onClick={() => handleSortBy('asc')}
           >
             Ascending
           </Button>
           <Button
-            variant={sortBy == 1 ? `outlined` : "contained"}
-            onClick={() => handleSortBy(-1)}
+            variant={sortBy == 'desc' ? `contained` : "outlined"}
+            onClick={() => handleSortBy('desc')}
           >
             Descending
           </Button>

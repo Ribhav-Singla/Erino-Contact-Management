@@ -165,7 +165,7 @@ export default function CreateContact() {
 
   return (
     <div className="flex flex-col justify-center items-center py-10 gap-5 bg-slate-50 h-full">
-      <div className="flex justify-start items-center max-w-[768px] w-full">
+      <div className="flex justify-start items-center max-w-[768px] w-full px-5">
         <Button variant="contained" onClick={() => navigate("/")}>
           <ArrowBackIcon />
         </Button>
@@ -176,7 +176,7 @@ export default function CreateContact() {
         sx={{ "& > :not(style)": { m: 1 } }}
         noValidate
         autoComplete="off"
-        className="flex flex-col max-w-[640px] w-full"
+        className="flex flex-col max-w-[640px] w-full px-5"
         onSubmit={handleSubmit}
       >
         <FormControl error={error.firstName ? true : false}>

@@ -83,20 +83,20 @@ function DeleteContact({
     <>
       <div className="overlay">
         <div
-          className="flex flex-col gap-5 justify-center items-center bg-white w-fit p-10 rounded-lg"
+          className="flex flex-col gap-2 sm:gap-5 justify-center items-center bg-white w-fit p-5 sm:p-10 rounded-lg m-5"
           ref={containerRef}
         >
-          <h1 className="text-2xl font-semibold">Contact</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold">Contact</h1>
           <div className="flex flex-col justify-center items-center">
-            <h1>
+            <h1 className="text-sm sm:text-base">
               {firstName} {lastName}
             </h1>
-            <h1>{email}</h1>
-            <h1>{phoneNumber}</h1>
-            <h1>{company}</h1>
-            <h1>{jobTitle}</h1>
+            <h1 className="text-sm sm:text-base">{email}</h1>
+            <h1 className="text-sm sm:text-base">{phoneNumber}</h1>
+            <h1 className="text-sm sm:text-base">{company}</h1>
+            <h1 className="text-sm sm:text-base">{jobTitle}</h1>
           </div>
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-xl font-semibold px-2 sm:px-0 text-center">
             Are you sure you want to delete?
           </h1>
           <Stack spacing={2} direction="row">

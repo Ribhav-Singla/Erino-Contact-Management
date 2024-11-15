@@ -161,7 +161,6 @@ export default function UpdateContact() {
           severity: "error",
         });
         setSnackbarOpen(true);
-
         console.log('error occured while updating the contact: ',error)
       }
     }
@@ -169,7 +168,7 @@ export default function UpdateContact() {
 
   return (
     <div className="flex flex-col justify-center items-center py-10 h-full gap-5 bg-slate-50">
-      <div className="flex justify-start items-center max-w-[768px] w-full">
+      <div className="flex justify-start items-center max-w-[768px] w-full px-5">
         <Button variant="contained" onClick={() => navigate("/contacts")}>
           <ArrowBackIcon />
         </Button>
@@ -180,7 +179,7 @@ export default function UpdateContact() {
         sx={{ "& > :not(style)": { m: 1 } }}
         noValidate
         autoComplete="off"
-        className="flex flex-col max-w-[640px] w-full"
+        className="flex flex-col max-w-[640px] w-full px-5"
         onSubmit={handleSubmit}
       >
         <FormControl error={error.firstName ? true : false}>
