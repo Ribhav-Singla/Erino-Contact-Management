@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: ["https://contact-management-eight-sooty.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
