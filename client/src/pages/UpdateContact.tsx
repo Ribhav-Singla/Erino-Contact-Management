@@ -11,10 +11,10 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import ShortTextIcon from "@mui/icons-material/ShortText";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import AddIcCallIcon from "@mui/icons-material/AddIcCall";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 interface FormDataType {
   firstName: string;
@@ -34,17 +34,18 @@ interface ErrorType {
   jobTitle?: string;
 }
 
-export default function CreateContact() {
+export default function UpdateContact() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { contact } = location.state || {};
   const [formData, setFormData] = useState<FormDataType>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    company: "",
-    jobTitle: "",
+    firstName: contact?.firstName || "",
+    lastName: contact?.lastName || "",
+    email: contact?.email || "",
+    phoneNumber: contact?.phoneNumber || "",
+    company: contact?.company || "",
+    jobTitle: contact?.jobTitle || "",
   });
-
   const [error, setError] = useState<ErrorType>({
     firstName: "",
     lastName: "",
@@ -122,13 +123,13 @@ export default function CreateContact() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center py-10 gap-5 bg-slate-50 h-full">
+    <div className="flex flex-col justify-center items-center py-10 h-full gap-5 bg-slate-50">
       <div className="flex justify-start items-center max-w-[768px] w-full">
-        <Button variant="contained" onClick={()=>navigate('/')}>
+        <Button variant="contained" onClick={() => navigate("/contacts")}>
           <ArrowBackIcon />
         </Button>
       </div>
-      <h1 className="text-xl font-semibold">Create Contact</h1>
+      <h1 className="text-xl font-semibold">Update Contact</h1>
       <Box
         component="form"
         sx={{ "& > :not(style)": { m: 1 } }}
@@ -243,11 +244,10 @@ export default function CreateContact() {
           <Button
             className="max-w-sm w-full"
             variant="contained"
-            color="success"
-            endIcon={<AddIcCallIcon />}
+            color="primary"
             type="submit"
           >
-            Create contact
+            Update contact
           </Button>
         </div>
       </Box>

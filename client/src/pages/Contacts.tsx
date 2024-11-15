@@ -10,8 +10,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Pagination from "@mui/material/Pagination";
-import { useState } from "react";
 import DeleteContact from "../components/DeleteContact";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // LIMIT is also defined in the backend as 15
 const LIMIT = 15;
@@ -56,6 +58,86 @@ const data = [
     company: "Innovative Systems",
     jobTitle: "Project Manager",
   },
+  {
+    firstName: "Sarah",
+    lastName: "Taylor",
+    email: "sarah.taylor@example.com",
+    phoneNumber: "0987654321",
+    company: "FinTech Solutions",
+    jobTitle: "Data Scientist",
+  },
+  {
+    firstName: "Chris",
+    lastName: "Miller",
+    email: "chris.miller@example.com",
+    phoneNumber: "0987654321",
+    company: "Digital Works",
+    jobTitle: "Backend Developer",
+  },
+  {
+    firstName: "Patricia",
+    lastName: "Davis",
+    email: "patricia.davis@example.com",
+    phoneNumber: "0987654321",
+    company: "Smart Apps",
+    jobTitle: "UI/UX Designer",
+  },
+  {
+    firstName: "James",
+    lastName: "Garcia",
+    email: "james.garcia@example.com",
+    phoneNumber: "0987654321",
+    company: "Enterprise Inc",
+    jobTitle: "DevOps Engineer",
+  },
+  {
+    firstName: "Sophia",
+    lastName: "Martinez",
+    email: "sophia.martinez@example.com",
+    phoneNumber: "0987654321",
+    company: "Health Tech",
+    jobTitle: "Product Designer",
+  },
+  {
+    firstName: "Brian",
+    lastName: "Lopez",
+    email: "brian.lopez@example.com",
+    phoneNumber: "0987654321",
+    company: "Eco World",
+    jobTitle: "Environmental Consultant",
+  },
+  {
+    firstName: "Olivia",
+    lastName: "Wilson",
+    email: "olivia.wilson@example.com",
+    phoneNumber: "0987654321",
+    company: "Edu Solutions",
+    jobTitle: "Instructional Designer",
+  },
+  {
+    firstName: "Jack",
+    lastName: "Clark",
+    email: "jack.clark@example.com",
+    phoneNumber: "0987654321",
+    company: "Mobile Labs",
+    jobTitle: "Android Developer",
+  },
+  {
+    firstName: "Liam",
+    lastName: "Robinson",
+    email: "liam.robinson@example.com",
+    phoneNumber: "0987654321",
+    company: "Retail Ventures",
+    jobTitle: "E-commerce Specialist",
+  },
+  {
+    firstName: "Emma",
+    lastName: "Harris",
+    email: "emma.harris@example.com",
+    phoneNumber: "0987654321",
+    company: "Global Ventures",
+    jobTitle: "Business Analyst",
+  },
 ];
 
 interface CONTACT {
@@ -68,6 +150,7 @@ interface CONTACT {
 }
 
 export default function Contacts() {
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<number>(1);
   const [rows, setRows] = useState(data);
   const [totalContacts, setTotalContacts] = useState<number>(200);
@@ -107,8 +190,13 @@ export default function Contacts() {
   };
 
   return (
-    <div className="my-10 bg-slate-50">
+    <div className="bg-slate-50 py-5">
       <div className="flex flex-col justify-center items-center gap-5 py-5 px-5 ">
+        <div className="flex justify-start items-center w-full">
+          <Button variant="contained" onClick={() => navigate("/")}>
+            <ArrowBackIcon />
+          </Button>
+        </div>
         <h1 className="text-xl font-semibold">SortBy</h1>
         <Stack spacing={2} direction="row">
           <Button
@@ -146,7 +234,7 @@ export default function Contacts() {
             <TableBody>
               {rows.map((row: CONTACT, index) => (
                 <TableRow
-                  key={row.phoneNumber}
+                  key={index}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
@@ -158,12 +246,18 @@ export default function Contacts() {
                   <TableCell align="right">{row.phoneNumber}</TableCell>
                   <TableCell align="right">{row.company}</TableCell>
                   <TableCell align="right">{row.jobTitle}</TableCell>
-                  <TableCell align="right">
+                  <TableCell
+                    align="right"
+                    onClick={() =>
+                      navigate(`/updateContact/${index}`, { state: { contact: row } })
+                    }
+                  >
                     <EditNoteIcon className="text-green-600 cursor-pointer" />
                   </TableCell>
                   <TableCell
                     align="right"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setSelectedContact(row);
                       setToggleDelete(!toggleDelete);
                     }}

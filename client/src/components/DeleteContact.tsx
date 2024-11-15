@@ -1,5 +1,6 @@
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
+import { ReactNode, useEffect, useRef } from "react";
 
 function DeleteContact({
   firstName,
@@ -18,10 +19,31 @@ function DeleteContact({
   jobTitle: string;
   setToggleDelete: React.Dispatch<React.SetStateAction<Boolean>>;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setToggleDelete(false);
+      } 
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
       <div className="overlay">
-        <div className="flex flex-col gap-5 justify-center items-center bg-white w-fit p-10 rounded-lg">
+        <div
+          className="flex flex-col gap-5 justify-center items-center bg-white w-fit p-10 rounded-lg"
+          ref={containerRef}
+        >
           <h1 className="text-2xl font-semibold">Contact</h1>
           <div className="flex flex-col justify-center items-center">
             <h1>
