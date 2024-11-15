@@ -14,7 +14,7 @@ export default function Homepage() {
           Create new contact
         </Button>
         <Button className="max-w-xs w-full" variant="contained" color="primary" endIcon={<PersonSearchIcon/>}>
-          Search contact
+          contact List
         </Button>
       </div>
     </>

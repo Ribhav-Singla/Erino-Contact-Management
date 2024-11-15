@@ -19,7 +19,7 @@ const contactsSchema = new mongoose.Schema(
       trim: true,
     },
     phoneNumber: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
     },

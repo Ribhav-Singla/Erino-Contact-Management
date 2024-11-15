@@ -1,4 +1,4 @@
-// contacts controllers
+const { contactvalidateSchema } = require("../zod/validate.js");
 const Contacts = require("../Models/contactsModel.js");
 
 const getContacts = async (req, res) => {
@@ -21,6 +21,11 @@ const getContacts = async (req, res) => {
 };
 
 const createContact = async (req, res) => {
+  const { success, error } = contactvalidateSchema.safeParse(req.body);
+  if (error) {
+    return res.status(400).json({ message: "Invalid request body" });
+  }
+
   const { firstName, lastName, email, phoneNumber, company, jobTitle } =
     req.body;
   try {
@@ -52,6 +57,11 @@ const createContact = async (req, res) => {
 };
 
 const updateContact = async (req, res) => {
+  const { success, error } = contactvalidateSchema.safeParse(req.body);
+  if (error) {
+    return res.status(400).json({ message: "Invalid request body" });
+  }
+
   const id = req.params.id;
   const { firstName, lastName, email, phoneNumber, company, jobTitle } =
     req.body;

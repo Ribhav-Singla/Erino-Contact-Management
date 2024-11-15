@@ -20,7 +20,7 @@ const data = [
     firstName: "John",
     lastName: "Doe",
     email: "john.doe@example.com",
-    phoneNumber: 1234567890,
+    phoneNumber: "1234567890",
     company: "Example Corp",
     jobTitle: "Software Engineer",
   },
@@ -28,7 +28,7 @@ const data = [
     firstName: "Jane",
     lastName: "Smith",
     email: "jane.smith@example.com",
-    phoneNumber: 9876543210,
+    phoneNumber: "1234567890",
     company: "Tech Innovations",
     jobTitle: "Product Manager",
   },
@@ -36,7 +36,7 @@ const data = [
     firstName: "Michael",
     lastName: "Johnson",
     email: "michael.johnson@example.com",
-    phoneNumber: 2345678901,
+    phoneNumber: "1234567890",
     company: "Global Solutions",
     jobTitle: "Marketing Director",
   },
@@ -44,7 +44,7 @@ const data = [
     firstName: "Emily",
     lastName: "Williams",
     email: "emily.williams@example.com",
-    phoneNumber: 3456789012,
+    phoneNumber: "1234567890",
     company: "Creative Agency",
     jobTitle: "Graphic Designer",
   },
@@ -52,7 +52,7 @@ const data = [
     firstName: "David",
     lastName: "Brown",
     email: "david.brown@example.com",
-    phoneNumber: 4567890123,
+    phoneNumber: "1234567890",
     company: "Innovative Systems",
     jobTitle: "Project Manager",
   },
@@ -62,7 +62,7 @@ interface CONTACT {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: number;
+  phoneNumber: string;
   company: string;
   jobTitle: string;
 }
@@ -131,13 +131,13 @@ export default function Contacts() {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>s.no</TableCell>
-                <TableCell align="right">firstName</TableCell>
-                <TableCell align="right">lastName</TableCell>
-                <TableCell align="right">email</TableCell>
-                <TableCell align="right">phoneNumber</TableCell>
-                <TableCell align="right">company</TableCell>
-                <TableCell align="right">jobTitle</TableCell>
+                <TableCell>S.No</TableCell>
+                <TableCell align="right">FirstName</TableCell>
+                <TableCell align="right">LastName</TableCell>
+                <TableCell align="right">Email</TableCell>
+                <TableCell align="right">PhoneNumber</TableCell>
+                <TableCell align="right">Company</TableCell>
+                <TableCell align="right">JobTitle</TableCell>
                 <TableCell align="right" colSpan={2}>
                   Actions
                 </TableCell>

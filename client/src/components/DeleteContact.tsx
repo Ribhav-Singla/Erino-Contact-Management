@@ -13,7 +13,7 @@ function DeleteContact({
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: number;
+  phoneNumber: string;
   company: string;
   jobTitle: string;
   setToggleDelete: React.Dispatch<React.SetStateAction<Boolean>>;
