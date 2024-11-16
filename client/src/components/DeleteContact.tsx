@@ -3,6 +3,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 function DeleteContact({
   id,
@@ -49,7 +50,7 @@ function DeleteContact({
         setSnackbarOpen(true);
         setTimeout(() => {
           setToggleDelete(false);
-          setRefreshContacts(prev => !prev);
+          setRefreshContacts((prev) => !prev);
         }, 500);
       }
     } catch (error) {
@@ -82,7 +83,19 @@ function DeleteContact({
   return (
     <>
       <div className="overlay">
-        <div
+        <motion.div
+          initial={{
+            scale: 0,
+          }}
+          animate={{
+            scale: 1,
+          }}
+          exit={{
+            scale: 0,
+          }}
+          transition={{
+            duration: 0.5,
+          }}
           className="flex flex-col gap-2 sm:gap-5 justify-center items-center bg-white w-fit p-5 sm:p-10 rounded-lg m-5"
           ref={containerRef}
         >
@@ -111,7 +124,7 @@ function DeleteContact({
               No
             </Button>
           </Stack>
-        </div>
+        </motion.div>
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={6000}
