@@ -12,6 +12,12 @@ Clone the project
 
 ```
 
+Enter the folder
+
+```bash
+  cd Erino-Contact-Management
+```
+
 For the client:
 
 ```bash
